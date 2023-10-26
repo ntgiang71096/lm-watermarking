@@ -42,7 +42,8 @@ The parameters' name explains itself but here is few notes when running it:
 
 ---------------
 
-### How this code works (I also commented on the code):
+### How this code works 
+(I also commented on the code)
 
 - First, load the model (e.g. **facebook/opt-1.3b**)
   
