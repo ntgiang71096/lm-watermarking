@@ -1,0 +1,148 @@
+wandb_version: 1
+
+model_name:
+  desc: null
+  value: meta-llama/Llama-2-7b-hf
+dataset_name:
+  desc: null
+  value: c4
+dataset_config_name:
+  desc: null
+  value: realnewslike
+shuffle_dataset:
+  desc: null
+  value: false
+shuffle_seed:
+  desc: null
+  value: 1234
+shuffle_buffer_size:
+  desc: null
+  value: 10000
+max_new_tokens:
+  desc: null
+  value: 200
+min_prompt_tokens:
+  desc: null
+  value: 50
+min_sample_tokens:
+  desc: null
+  value: 0
+limit_indices:
+  desc: null
+  value: 500
+input_truncation_strategy:
+  desc: null
+  value: completion_length
+input_filtering_strategy:
+  desc: null
+  value: prompt_and_completion_length
+output_filtering_strategy:
+  desc: null
+  value: max_new_tokens
+initial_seed:
+  desc: null
+  value: 1234
+dynamic_seed:
+  desc: null
+  value: markov_1
+bl_proportion:
+  desc: null
+  value: 0.5
+bl_logit_bias:
+  desc: null
+  value: 2.0
+bl_type:
+  desc: null
+  value: soft
+num_beams:
+  desc: null
+  value: 1
+no_repeat_ngram_size:
+  desc: null
+  value: 0
+early_stopping:
+  desc: null
+  value: false
+oracle_model_name:
+  desc: null
+  value: facebook/opt-2.7b
+no_wandb:
+  desc: null
+  value: false
+wandb_project:
+  desc: null
+  value: demo-watermark
+wandb_entity:
+  desc: null
+  value: nguyentruonggiang71096
+run_name:
+  desc: null
+  value: example_run
+output_dir:
+  desc: null
+  value: ./all_runs
+load_prev_generations:
+  desc: null
+  value: false
+store_bl_ids:
+  desc: null
+  value: false
+store_spike_ents:
+  desc: null
+  value: true
+use_sampling:
+  desc: null
+  value: true
+sampling_temp:
+  desc: null
+  value: 0.7
+generate_only:
+  desc: null
+  value: false
+all_gas_no_eos:
+  desc: null
+  value: false
+SLURM_JOB_ID:
+  desc: null
+  value: null
+SLURM_ARRAY_JOB_ID:
+  desc: null
+  value: null
+SLURM_ARRAY_TASK_ID:
+  desc: null
+  value: null
+_wandb:
+  desc: null
+  value:
+    python_version: 3.8.10
+    cli_version: 0.15.12
+    framework: huggingface
+    huggingface_version: 4.34.0.dev0
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1696841884.978461
+    t:
+      1:
+      - 1
+      - 11
+      - 49
+      - 51
+      - 55
+      - 105
+      2:
+      - 1
+      - 11
+      - 49
+      - 51
+      - 55
+      - 105
+      3:
+      - 13
+      - 16
+      - 23
+      4: 3.8.10
+      5: 0.15.12
+      6: 4.34.0.dev0
+      8:
+      - 5
+      13: linux-x86_64

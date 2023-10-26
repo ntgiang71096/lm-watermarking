@@ -63,7 +63,7 @@ class BlacklistLogitsProcessor(LogitsProcessor):
     def __init__(self, 
                 bad_words_ids: List[List[int]], 
                 eos_token_id: int,
-                vocab: list[int], 
+                vocab: List[int], 
                 vocab_size: int,
                 bl_proportion: float=0.5,
                 bl_logit_bias: float=1.0,
@@ -199,7 +199,7 @@ class BlacklistLogitsProcessor(LogitsProcessor):
 
         return scores
 
-    def _prepare_bad_words(self, bad_words_ids: List[List[int]]) -> list[int]:
+    def _prepare_bad_words(self, bad_words_ids: List[List[int]]) -> List[int]:
         bad_words_ids = list(filter(lambda bad_token_seq: bad_token_seq != [self.eos_token_id], bad_words_ids))
         return bad_words_ids
         # used to have more logic, not used now
@@ -337,8 +337,8 @@ def tokenize_for_generation(example: dict,
                                     prompt_length=min_prompt_tokens,
                                     hf_model_name=hf_model_name,
                                     tokenizer=tokenizer,
-                                    # model_max_seq_len=model.config.max_position_embeddings)
-                                    model_max_seq_len=None)
+                                    model_max_seq_len=model.config.max_position_embeddings)     # giang: comment this later
+                                    # model_max_seq_len=None)                   # giang: uncomment this later
     inputs = example["inputs"]
     # for calculating the baseline violation rate across the "gold" completion
     untruncated_inputs = example["untruncated_inputs"]
@@ -391,7 +391,9 @@ def generate_completions(example: dict,
     # decoded_untruncated_input = tokenizer.batch_decode(untruncated_inputs, skip_special_tokens=True)[0]
     # example.update({"baseline_completion":decoded_untruncated_input.replace(re_decoded_input,"")})
 
+    # giang: question: What is "inputs" and "truncated_input"
     inputs = example["inputs"]
+
     re_decoded_input = example["truncated_input"]
 
     # call the vanilla and watermarked generation function wrappers with the preprocessed inputs

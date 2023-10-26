@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+./experiments/giang_result_11_oct_2.txt
+./experiments/all_runs/gen_table.jsonl
+./experiments/all_runs/gen_table_meta.json
+./experiments/all_runs/gen_table_w_metrics.jsonl
+./experiments/all_runs
+./experiments/all_runs_11_oct/gen_table.jsonl
+./experiments/all_runs_11_oct/gen_table_meta.json
+./experiments/all_runs_11_oct/gen_table_w_metrics.jsonl
+./experiments/all_runs_11_oct
+./experiments/giang_result.txt

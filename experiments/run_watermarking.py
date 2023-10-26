@@ -35,7 +35,8 @@ print(os.environ["HF_HOME"])
 from transformers import (AutoTokenizer, 
                           AutoModelForSeq2SeqLM, 
                           AutoModelForCausalLM,
-                          LogitsProcessorList)
+                          LogitsProcessorList,
+                          LlamaForCausalLM, LlamaTokenizer)
 
 from datasets import load_dataset, Dataset
 
@@ -89,6 +90,9 @@ def main(args):
     ###########################################################################
     # Instantiate model and tokenizer
     ###########################################################################
+
+    # giang: step 1: load model and tokenizer for text generation
+
     hf_model_name = args.model_name
 
     if "t5" in hf_model_name or "T0" in hf_model_name:
@@ -100,13 +104,16 @@ def main(args):
 
     # defaults to device 0
     # will need to use 'parallelize' for multi-gpu sharding
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda:2" if torch.cuda.is_available() else "cpu"
     model = model.to(device)
     model.eval()
 
     ###########################################################################
     # Load the dataset
     ###########################################################################
+
+
+    # giang: step 2: Load the dataset
 
     dataset_name, dataset_config_name = args.dataset_name, args.dataset_config_name
 
@@ -134,6 +141,9 @@ def main(args):
     ###########################################################################
     # Construct the blacklist processor/sampler
     ###########################################################################
+
+    # giang: step 3: Construct the blacklist processor/sampler that enforces that specified sequences will never be sampled.
+    # A LogitsProcessor can be used to modify the prediction scores of a language model head for generation.
 
     all_token_ids = list(tokenizer.get_vocab().values())
     vocab_size = len(all_token_ids)
@@ -185,6 +195,13 @@ def main(args):
     if args.all_gas_no_eos:
         gen_kwargs.update(dict(suppress_tokens=[tokenizer.eos_token_id]))
 
+    # giang: In Python, the functools.partial function is a higher-order function
+    # that allows you to "freeze" or "fix" some of the arguments of an existing function, 
+    # creating a new function with those arguments preset. 
+    # This can be especially useful in situations where you need to create specialized functions
+    # based on existing ones or when you want to simplify function calls by reducing the number of arguments.
+    
+    # Create two functions, one uses model for generation without using black list, the other for generation using blacklist
     generate_without_blacklist = partial(
         model.generate,
         **gen_kwargs
@@ -218,6 +235,10 @@ def main(args):
         token_kwargs.update(dict(max_new_tokens=max_new_tokens))
     else:
         ValueError(f"Unknown input truncation strategy {args.input_truncation_strategy}")
+
+
+    # giang: create function for tokenizing prompt
+            
     tokenize_prompts = partial(
         tokenize_for_generation,
         **token_kwargs
@@ -238,6 +259,9 @@ def main(args):
                                        min_completion_len = max_new_tokens))
     else:
         ValueError(f"Unknown input filtering strategy {args.input_filtering_strategy}")
+
+    # giang: create function to check input length
+
     input_check = partial(
         check_input_lengths,
         **input_check_kwargs
@@ -249,10 +273,16 @@ def main(args):
         output_kwargs = dict(min_output_len = 0)
     else:
         ValueError(f"Unknown output filtering strategy {args.output_filtering_strategy}")
+
+    # giang: create function to check output length
+
     output_check = partial(
         check_output_lengths,
         **output_kwargs
     )
+
+    
+    # giang: create gen function to generate text completion with two modes: with and without using blacklist
 
     gen_completions = partial(
         generate_completions,
@@ -353,10 +383,12 @@ def main(args):
                       f"{i} of {len(processed_examples)} rows were satisfactory so far",
                       f"current generation overhead ratio: {round(len(processed_examples)/(i+1), 3)}",
                       f"completed {round(i/args.limit_indices, 2)} of total")
-    
-    print(f"#"*80,
-          f"\nGeneration output length check overhead was num rows processed={len(processed_examples)}",
-          f"for {args.limit_indices} samples. Ratio: {round(len(processed_examples)/args.limit_indices, 3)}")
+
+            # break       # giang: remove this. It's for debugging only
+        
+        print(f"#"*80,
+            f"\nGeneration output length check overhead was num rows processed={len(processed_examples)}",
+            f"for {args.limit_indices} samples. Ratio: {round(len(processed_examples)/args.limit_indices, 3)}")
     
     ###########################################################################
     # Generation jsonl dumping/loading
@@ -431,6 +463,9 @@ def main(args):
         model = model.to(torch.device("cpu"))
         del model
 
+
+    # giang: question: the different between model and oracle model?
+
     oracle_model_name = args.oracle_model_name
     print(f"Loading oracle model: {oracle_model_name}")
     
@@ -482,7 +517,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_name",
         type=str,
-        default="facebook/opt-2.7b",
+        default="facebook/opt-2.7b", # original facebook/opt-2.7b
         help="Main model, path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
@@ -634,13 +669,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="lm-blacklisting",
+        default="demo-watermark",
         help="The name of the wandb project.",
     )
     parser.add_argument(
         "--wandb_entity",
         type=str,
-        default="jwkirchenbauer",
+        default="nguyentruonggiang71096",
         help="The wandb entity/user for the project.",
     )
     parser.add_argument(
