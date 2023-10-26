@@ -1,7 +1,8 @@
 [Giang]
 
-[[toc]]
-
+- [How to run this code](#How-to-run-this-code)
+- [How this code works](#How-this-code-works)
+  
 Few notes for this repository:
 
 ### How to run this code
