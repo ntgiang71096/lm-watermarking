@@ -2,7 +2,8 @@
 
 - [How to run this code](#How-to-run-this-code)
 - [How this code works](#How-this-code-works)
-  
+- [Evaluation](#Evaluation)
+   
 Few notes for this repository:
 
 ### How to run this code
@@ -56,3 +57,27 @@ The parameters' name explains itself but here is few notes when running it:
 - Construct the pipeline for generation and measurement that pulls from the streaming dataset, applies the generations map funcs. Specifically, in **run_watermarking.py**, firstly, there is only the **dataset** instance.
   By applying functions (i.e., map(), shuffle(), filter()), they define the pipeline (but no execution yet). The pipeline is: indexed_dataset -> shuffled_dataset -> tokenized_and_truncated_dataset -> input_length_filtered_dataset -> generations_dataset.
   To execute, they create an iterator object using **generations_dataset** and call ```next()``` on the iterator
+
+---------------
+
+### Evaluation
+
+**Metric used - Perplexity (PPL)**: In general, perplexity is a measurement of how well a probability model predicts a sample. In the context of Natural Language Processing, perplexity is one way to evaluate language models (ref: https://medium.com/nlplanet/two-minutes-nlp-perplexity-explained-with-simple-probabilities-6cdc46884584). 
+
+Implementation: ```compute_ppl_single()``` 
+
+To compute PPL, they use an **oracle model**. In the context of natural language processing (NLP) and machine learning, an oracle model is a model that is considered to be the ground truth or an ideal reference model for a specific task. It is often used for evaluation or comparison purposes to measure the performance of other models. For example, in this experiment, the text is generated using model **facebook/opt-1.3b**, and the oracle model is **facebook/opt-2.7b**. Since the latter one is trained using more parameters, is it considered better and used as oracle model, lol?
+
+How the function works:
+  Input: **prompt** + **completion** => I call it **full_text**
+  
+  Preprocessing: they masked all the **input_ids** of **full_text** that corresponds to prompt as -100, so that when calculating loss of the oracle model, it only takes the completion part into consideration.
+
+  **Basically and literally, PPL is the exponential value of the average cross-entropy loss on all positions of the "completion" part.**
+
+Given a text example, they truncate it and treat the first part as prompt, and the second part as **baseline_completion**.
+
+With prompt as input to their **blacklist processor**, they generate two other completions: **no_bl_output** (no blacklist output) and **w_bl_output** (with blacklist output).
+
+For each example, PPL is calculated on these 3 completions.
+  
